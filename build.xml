@@ -1,0 +1,76 @@
+<project name="NJTFV2cn0N" default="dist" basedir=".">
+	<description>
+    simple example build file
+  </description>
+	<!-- set global properties for this build -->
+	<property name="src" location="src" />
+	<property name="src.tests" location="test" />
+	<property name="build" location="build" />
+	<property name="dist" location="dist" />
+	<property name="DSTAMP" value="1.0" />
+	<property name="reports.tests" location="reports.tests" />
+
+	<target name="init" depends="clean">
+		<!-- Create the time stamp -->
+		<tstamp />
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${build}" />
+		<mkdir dir="${reports.tests}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source">
+		<!-- Compile the Java code from ${src} into ${build} -->
+		<javac srcdir="${src}" destdir="${build}" />
+	</target>
+
+	<target name="compile.test" depends="init" description="compile the source">
+		<!-- Compile the Java code from ${src} into ${build} -->
+		<javac srcdir="${src.tests}" destdir="${build}">
+			<classpath>
+				<pathelement path="./lib/junit.jar" />
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="test" depends="compile,compile.test" description="test the source">
+		<junit printsummary="yes" haltonfailure="yes">
+			<classpath>
+				<pathelement location="${build}" />
+				<pathelement path="./lib/junit.jar" />
+				<pathelement path="./lib/hamcrest-core-1.3.jar" />
+				<!-- 
+				<pathelement path="./lib/ant-junit.jar" />
+	     -->
+			</classpath>
+
+			<formatter type="plain" />
+
+			<!-- 
+			<test name="my.test.TestCase" haltonfailure="no" outfile="result">
+				<formatter type="xml" />
+			</test>
+     -->
+
+			<batchtest fork="yes" todir="${reports.tests}">
+				<fileset dir="${src.tests}">
+					<include name="**/*Test*.java" />
+					<exclude name="**/AllTests.java" />
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="dist" depends="test" description="generate the distribution">
+		<!-- Create the distribution directory -->
+		<mkdir dir="${dist}/lib" />
+
+		<!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
+		<jar jarfile="${dist}/lib/NJTFV2cn0N-${DSTAMP}.jar" basedir="${build}" />
+	</target>
+
+	<target name="clean" description="clean up">
+		<!-- Delete the ${build} and ${dist} directory trees -->
+		<delete dir="${build}" />
+		<delete dir="${dist}" />
+	</target>
+</project>
